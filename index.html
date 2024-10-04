@@ -1,0 +1,143 @@
+<form [formGroup]="formReturned">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Book No</th>
+                        <th>Form No</th>
+                        <th>Name of the New Member</th>
+                        <th>Membership Type</th>
+                        <th>Amount</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody formArrayName="forms">
+                    <tr *ngFor="let form of forms.controls; let i = index"
+                        [formGroupName]="i">
+                        <td><input type="text" formControlName="bookNo"
+                                class="form-control"></td>
+                        <td><input type="text" formControlName="formNo"
+                                class="form-control"></td>
+                        <td><input type="text" formControlName="memberName"
+                                class="form-control"></td>
+                        <td>
+                            <select class="form-select form-control"
+                                formControlName="membershipType"
+                                (change)="onMembershipTypeChange($event,form, i)">
+                                <option selected disabled>Choose...</option>
+                                <option
+                                    *ngFor="let key of membershipOptions | keyvalue"
+                                    [value]="key.key">{{ key.key }} - ₹{{
+                                    key.value }}</option>
+                                <option value="Upgrade">Upgrade</option>
+                            </select>
+                        </td>
+                        <div *ngIf="ispopup" class="popup-overlay" style="z-index: 10009;">
+                            <div class="popup-content" style="width: 70vw;">
+                                <div class="bg-color-header p-2">
+                                    <h3 class="m-0">Upgrade Member</h3>
+                                </div>
+                                <hr>
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <!-- Search Member ID -->
+                                        <div class="col-md-4">
+                                            <label for="memberIdSearch">Search Member ID</label>
+                                            <div
+                                                class="d-flex justify-content-center align-items-center">
+                                                <input class="form-control me-2" type="search"
+                                                    placeholder="Search" aria-label="Search"
+                                                    (input)="updateSearchData($event)">
+                                                <button
+                                                    class="btn btn-outline-success d-flex justify-content-center align-items-center"
+                                                    style="margin-top: 0px !important;" type="submit"
+                                                    (click)="searchingByMembershipId()">Search</button>
+                                            </div>
+                                        </div>
+                        
+                                        <!-- Current Type -->
+                                        <div class="col-md-4">
+                                            <label for="currentTypeSearch">Current Type</label>
+                                            <div
+                                                class="d-flex justify-content-center align-items-center">
+                                                <input id="currentTypeSearch" class="form-control me-2"
+                                                    type="text"
+                                                    [(ngModel)]="membershipType"
+                                                    placeholder="Search Current Type" readonly>
+                                            </div>
+                                        </div>
+                        
+                                        <!-- Desired Type -->
+                                        <div class="col-md-4">
+                                            <label for="desiredTypeSearch">Desired Type</label>
+                                            <div
+                                                class="d-flex justify-content-center align-items-center">
+                                                <select id="membershipType" [(ngModel)]="desiredValue"
+                                                    (change)="onMembershipChange($event)"
+                                                    class="form-select form-control m-2">
+                                                    <option selected disabled>Choose...</option>
+                                                    <option value="250">Life Member - ₹250</option>
+                                                    <option value="1000">Ashrayadatha - ₹1000</option>
+                                                    <option value="2500">Upaposhaka - ₹2500</option>
+                                                    <option value="5000">Institutional Member -
+                                                        ₹5000</option>
+                                                    <option value="5000">Sahaposhaka - ₹5000</option>
+                                                    <option value="10000">Poshaka - ₹10,000</option>
+                                                    <option value="25000">Mahaposhaka - ₹25,000</option>
+                                                    <option value="50000">Dani - ₹50,000</option>
+                                                    <option value="100000">Mahadani - ₹1,00,000</option>
+                                                    <option value="250000">Danashiromani -
+                                                        ₹2,50,000</option>
+                                                    <option value="500000">Dasohi - ₹5,00,000</option>
+                                                    <option value="1000000">Mahadasohi -
+                                                        ₹10,00,000</option>
+                                                    <option value="2500000">Paramadasohi -
+                                                        ₹25,00,000</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- Amount Difference -->
+                                        <div class="col-md-4">
+                                            <label for="amount">Payable Amount</label>
+                                            <input id="amount" class="form-control me-2" type="text"
+                                                [value]="amountDifference" readonly>
+                                        </div>
+                                    </div>
+                                </div><br>
+                                <div class="container-fluid" *ngIf="searchedUser">
+                                    <h6 style="color: rgb(69, 69, 252); cursor: pointer;"
+                                        (click)="goToviewUser(searchedUser)">Navigate To Edit User</h6>
+                                </div>
+                                <div class="d-flex flex-row justify-content-end">
+                                    <div
+                                        class="col-lg-3 col-md-4 col-sm-6 d-flex justify-content-end align-items-center">
+                                        <button class="btn btn-primary btn-sm"
+                                            (click)="save()"><b>Save</b></button>
+                                        <button class="btn btn-secondary btn-sm" (click)="close()">
+                                            <b>Close</b>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <td><input type="number" formControlName="amount"
+                                class="form-control" readonly></td>
+                        <td>
+                            <button type="button" class="btn btn-danger"
+                                (click)="removeForm(i)"
+                                *ngIf="forms.length > 1">Remove</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"
+                            class="text-right"><strong>Total</strong></td>
+                        <td>{{ totalAmount }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="form-group text-right">
+                <button type="button" class="btn btn-primary"
+                    (click)="addForm()">Add Row</button>
+                <button type="submit" class="btn btn-danger"
+                    (click)="onSubmit()">Submit</button>
+            </div>
+        </form>
